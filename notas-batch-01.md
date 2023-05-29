@@ -2,9 +2,9 @@
 
 # BOOTCAMP DE PROGRAMACIÓN BLOCKCHAIN - BLOCKCHAIN BITES Y NTT DATA
 
-![image-20230528200209176](/Users/steveleec/Documents/Blockchain Bites/batch-01-bootcamp/README.assets/image-20230528200209176.png)
+![image-20230528200209176](https://github.com/Blockchain-Bites/batch-01-bootcamp/assets/3300958/202ca065-2c3e-4991-a4cc-f9ad1f10a8b2)
 
-![BOOTCAMP CURSO](/Users/steveleec/Documents/Blockchain Bites/batch-01-bootcamp/README.assets/BOOTCAMP CURSO Facebook.jpg)
+![BOOTCAMP CURSO](https://github.com/Blockchain-Bites/batch-01-bootcamp/assets/3300958/e80901e7-3c9b-48c5-981d-1ca28d224ba4)
 
 # Fechas
 
@@ -45,7 +45,7 @@ Este juego debe ser completado dentro de las tres semanas de clases empezando el
 
 Terminar estas dos fases:
 
-![image-20230528200524272](/Users/steveleec/Documents/Blockchain Bites/batch-01-bootcamp/README.assets/image-20230528200524272.png)
+![image-20230528200524272](https://github.com/Blockchain-Bites/batch-01-bootcamp/assets/3300958/d82d1b12-ffa8-4a5c-9cf0-638b171e9990)
 
 # Síguenos
 
