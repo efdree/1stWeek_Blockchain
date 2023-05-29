@@ -20,6 +20,16 @@ Presentación proyecto final: 30 de Junio
 
 [Inscríbete a la fecha del proyecto final](https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=NW9jaWk1aTVvdmU2cmN0OWwydmgxNmNlOWQgbGVlLm1hcnJlcm9zQGJsb2NrY2hhaW5iaXRlcy5jbw&tmsrc=lee.marreros%40blockchainbites.co)
 
+# Foro (preguntas), material estudio
+
+[Invitación Discord](https://discord.com/invite/7qjKQGmjUq)
+
+[Invitación #batch-1-bootcamp-presencial](https://discord.gg/7GSx3tBg)
+
+[Preguntas y respuestas](https://discord.gg/kv4w7XTV)
+
+[Materiales de estudio](https://discord.gg/d7bAma3f)
+
 # Mentores
 
 Reunión con los mentores vía virtual:
