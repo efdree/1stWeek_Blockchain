@@ -1,19 +1,23 @@
-import { ethers } from "hardhat";
+import hre, { ethers } from "hardhat";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
+  const MiPrimerContrato = await ethers.getContractFactory("MiPrimerContrato");
+  const miPrimerContrato = await MiPrimerContrato.deploy();
 
-  const lockedAmount = ethers.utils.parseEther("0.001");
+  var tx = await miPrimerContrato.deployed();
 
-  const Lock = await ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
-
-  await lock.deployed();
-
+  await tx.deployTransaction.wait(5);
   console.log(
-    `Lock with ${ethers.utils.formatEther(lockedAmount)}ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
+    "Mi primer token esta publicado en el address",
+    miPrimerContrato.address
   );
+
+  console.log("Empezo la verificaion");
+  // script para verificacion del contrato
+  await hre.run("verify:verify", {
+    address: miPrimerContrato.address,
+    constructorArguments: [],
+  });
 }
 
 // We recommend this pattern to be able to use async/await everywhere
