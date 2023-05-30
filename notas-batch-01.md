@@ -111,7 +111,7 @@ Terminar estas dos fases:
 
 6. Comprobar que no hay ningún error ejecutando el siguiente comando:
 
-   - `$ npx hardhat --network mumbai run scripts/deploy.js`
+   - `$ npx hardhat --network mumbai run scripts/deploy.ts`
    - Esperar de 2 a 3 minutos mientras se hace el deployment.
    - Si todo fue correctamente ejecutado, se verá el siguiente resultado:
 
@@ -351,4 +351,16 @@ Las herramientas de un blockchain developer son variadas e incluyen herramientas
 
 # Encuesta para la selección de equipos
 
-[Clic aquí](https://tally.so/r/nPD01P)
+[Clic aquí](https://tally.so/r/meDE10)
+
+**Author: Lee Marreros**
+
+# CRIPTOGRAFÍA DE LLAVE PÚBLICA (UNA FORMA DE CIFRADO ASIMÉTRICO)
+
+## Pre-introducción: ¿Qué es un método de hasheo?
+
+Es la manera en la cual se puede convertir una cantidad arbitraria de información en un resultado fijo en tamaño.
+
+En blockchain se usan dos métodos de hasheo: el SHA256 y keccak256. Ambos producen 32 bytes o 64 caracteres como resultado.
+
+[Utiliza este playground](https://emn178.github.io/online-tools/sha256.html) para analizar las propiedades
