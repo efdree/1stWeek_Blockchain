@@ -111,7 +111,7 @@ Terminar estas dos fases:
 
 6. Comprobar que no hay ningún error ejecutando el siguiente comando:
 
-   - `$ npx hardhat --network mumbai run scripts/deploy.js`
+   - `$ npx hardhat --network mumbai run scripts/deploy.ts`
    - Esperar de 2 a 3 minutos mientras se hace el deployment.
    - Si todo fue correctamente ejecutado, se verá el siguiente resultado:
 
