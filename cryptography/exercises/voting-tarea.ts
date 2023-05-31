@@ -36,10 +36,10 @@ import {
 } from "eth-crypto";
 
 export async function encryptVote(
-    voterPrivateKey: string,
-    candidate: string,
-    officialPublicKey: string
-): Promise<string> { }
+    voterPrivateKey,
+    candidate,
+    officialPublicKey
+) { }
 
 export async function decryptVoteAndCount(
     publicKeyVoters: string[],
