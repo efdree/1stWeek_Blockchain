@@ -970,3 +970,9 @@ async function decryptingBobMessage() {
 
 decryptingBobMessage();
 ```
+
+
+
+Pad día #3
+
+https://pad.riseup.net/p/clase-dia3-bootcamp
