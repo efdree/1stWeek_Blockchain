@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.18;
 
-contract Mapping {
+contract MappingClass {
     /**
      * Digamos que deseo guardar en una tabla de doble entrada
      * el saludo de cada persona que me visite.

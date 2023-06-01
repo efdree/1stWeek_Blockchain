@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.18;
 
-contract Mapping {
+contract MappingErrores {
     address public owner;
 
     constructor() {
