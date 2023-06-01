@@ -39,7 +39,7 @@ describe("Mappings: simple, double, triple", function () {
       const { mappingSol, owner, alice } = await loadFixture(deployFixture);
 
       await expect(
-        mappingSol.guardarActivoDoble(owner.address, 999999, 1)
+        mappingSol.guardarActivoDoble(owner.address, 1000000, 1)
       ).to.be.revertedWith("Codigo de activo invalido");
 
       await expect(
@@ -63,12 +63,12 @@ describe("Mappings: simple, double, triple", function () {
       ).to.be.revertedWith("El address no puede ser 0x00");
 
       await expect(
-        mappingSol.guardarActivoTriple(1, owner.address, 999999, 1)
+        mappingSol.guardarActivoTriple(1, owner.address, 1000000, 1)
       ).to.be.revertedWith("Codigo de activo invalido");
 
-      await expect(mappingSol.guardarActivoTriple(999999, owner.address, 1, 1))
+      await expect(mappingSol.guardarActivoTriple(1000000, owner.address, 1, 1))
         .to.revertedWithCustomError(mappingSol, "CiudadInvalidaError")
-        .withArgs(999999);
+        .withArgs(1000000);
     });
   });
 });
