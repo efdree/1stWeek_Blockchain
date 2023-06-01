@@ -55,6 +55,7 @@ pragma solidity 0.8.18;
  *
  * 3 - Validar que los códigos de ciudad
  *      Crear un Custom Error llamado CiudadInvalidaError(uint256 ciudadId)
+ *      npx hardhat test test/EjercicioIntegrador_1.ts
  */
 
 contract Mapping {

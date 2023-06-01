@@ -971,8 +971,546 @@ async function decryptingBobMessage() {
 decryptingBobMessage();
 ```
 
+Pad día #1
 
+https://pad.riseup.net/p/clase-dia1-bootcamp
 
 Pad día #3
 
 https://pad.riseup.net/p/clase-dia3-bootcamp
+
+## Hash table en contratos inteligentes
+
+### Es como un diccionario
+
+Podemos imaginar que mapping es como un diccionario. Cada vez que quieres saber la definición de una palabra lo buscas en la lista y al encontrarla, obtienes el significado de dicha palabra. Mapping en Solidity es una lista que conecta dos valores: una llave y el valor (de dicha llave). En el caso del diccionario, se conecta la palabra con su significado. Por lo tanto, la palabra sería la llave y el significado sería el valor asociado a esa llave.
+
+Entonces podemos decir que mapping en Solidity es una estructura de datos que guarda la información en base a llaves y valores. Tanto las llaves como los valores asociados a esas llaves pueden ser de diferentes tipos de datos con pequeñas limitaciones.
+
+### Mapping en javascript
+
+En `javascript` podemos crear un `mapping` de la siguiente manera:
+
+```javascript
+var diccionario = {}
+diccionario["computadora"] = "Máquina electrónica";
+```
+
+Al hacer esto, hemos asociado la llave `computadora` con el valor de `Máquina electrónica`. Cuando queremos solicitar el valor de esta llave, realizamos lo siguiente:
+
+```javascript
+console.log(diccionario["computadora"]); // Máquina electrónica
+```
+
+Es decir, accedemos al valor asociada a dicha llave pasando la llave al `mapping`.
+
+### Mapping en Solidity
+
+Sin embargo, en Solidity debemos definir los tipos de datos a usar dentro del `mapping`. Dado que para este ejemplo estamos usando un tipo de dato `string` para la llave y un tipo de dato `string` para el valor asociado a esa llave, hacemos lo siguiente. Veamos:
+
+```solidity
+mapping(string => string) diccionario;
+diccionario["computadora"] = "Máquina electrónica";
+```
+
+El tipo de datgo `mapping` en solidity es una de las estructuras de datos más usados en Solidity. Podemos definirlo de manera genérica del siguiente modo:
+
+```
+mapping(KeyType => ValueType) mappingName;
+```
+
+Los tipos de data para llave y su valor asociado son definidos de antemano.
+
+### Tipos de datos para llave y su valor
+
+Veamos la lista de tipos de dato tanto para las llaves como para los valores asociados a cada llave:
+
+| Types                     | Key Type | Value Type |
+| ------------------------- | -------- | ---------- |
+| boolean (bool)            | ✅        | ✅          |
+| integer (uint256)         | ✅        | ✅          |
+| unsigned integer (int256) | ✅        | ✅          |
+| address                   | ✅        | ✅          |
+| string                    | ✅        | ✅          |
+| enum                      | ✅        | ✅          |
+| bytes                     | ✅        | ✅          |
+| Contract                  | ✅        | ✅          |
+| mapping                   | ❌        | ✅          |
+| struct                    | ❌        | ✅          |
+| array types               | ❌        | ✅          |
+
+El tipo de dato para las llaves son más limitadas. Sin embargo, para el valor de las llaves puede tomar cualquier tipo de datos.
+
+### Es parte del storage
+
+Los `mapping` solo pueden tener la ubicación de `storage` dentro de la estructura de un contrato inteligente. No pueden ser usados como argumentos o valores de retorno de funciones públicas.
+
+### Getter automático
+
+En la definición de un `mapping` se puede incluir un modificador de su visibilidad de la siguiente manera:
+
+```solidity
+mapping(string => string) public diccionario;
+```
+
+Al incluir el visibilizador de `public`, Solidity crea automáticamente un método para obtener información del `mapping`. Es decir, Solidity creará un `getter`. El argumento de este método `getter` será la llave del mapping y el valor de retorno será el valor asociado a dicha llave.
+
+### Nombre de llave y nombre del valor
+
+De manera opcional, se puede incluir en la definición de un `mapping` los nombres para la llave y su valor de la siguiente manera:
+
+```solidity
+mapping(string palabra => string definicion) diccionario;
+```
+
+Esto agrega mayor experiencia de usuario para el usuario porque puede entender con mayor claridad de qué trata la llave y su valor asociado.
+
+### Inicialización de un `mapping` 
+
+Cuando un `mapping` se define, automáticamente todos los valores asociados a cada una de las llaves del `mapping` también se inicializan a un valor por defecto (definido por Solidity). El valor de inicialización dependerá del tipo de dato usado. Veamos unos ejemplos:
+
+```solidity
+// mapping que va de un entero a un entero
+mapping(uint256 => uint256) integerToInteger;
+
+// solicitemos valores
+integerToInteger[123]; // 0
+integerToInteger[456]; // 0
+
+// mapping que va de un string a un bool
+mapping(string => uint256) stringToInteger;
+
+// solicitemos valores
+stringToInteger["cualquier valor"]; // ""
+stringToInteger["otro valor"]; // ""
+```
+
+La inicialización automática en Solidity deviene en que no existe la posibilidad de encontrar valores sin definir del tipo `undefined` como sí lo hay en otros lenguajes de programación.
+
+### Longitud e iteración de un `mapping`
+
+No se puede iterar sobre un `mapping`. Ello porque por defecto todo el mapping se inicializa y no se lleva la cuenta de aquellos valores que ya se guardaron y cuales no. Dado que no se puede sabar qué llaves se actualizaron, tampoco podemos saber la longitud de un `mapping`.
+
+Se puede crear otra estructura de datos adicional al `mapping` para llevar la cuenta de las llaves que se están inicializando. Típicamente esta estructura de dato es un array.
+
+Para eliminar la información de un `mapping` necesariamente se tiene que saber la llave que se busca limpiar. Lo hacemos de la siguiente manera:
+
+```solidity
+mapping(uint256 => uint256) integerToInteger;
+mapping[123] = 123;
+delete mapping[123];
+mapping[123]; // 0
+```
+
+Con `delete` borramos la llave y el valor asociado a dicha llave. La siguiente vez que se consulta dicha llave se encontrará su valor de inicialización por defecto.
+
+### Ejercicio
+
+Resolvamos el siguiente ejercicio usando mappings. Digamos que deseo guardar en el smart contract la siguiente información. Guardaré el saludo de cada persona que me visite. La tabla luce como la siguiente:
+
+| Nombre (key) | Saludo (value)   |
+| ------------ | ---------------- |
+| Juan         | Hola, soy Juan   |
+| Maria        | Hola, soy Maria  |
+| Jose         | Hola, soy Jose   |
+| Carlos       | Hola, soy Carlos |
+| Alicia       | Hola, soy Alicia |
+
+`Mapping_2.sol`
+
+Solución en Solidity:
+
+```solidity
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.8.18;
+
+contract Mapping {
+    mapping(string => string) listaSaludosPorNombre;
+
+    function guardarSaludoPorNombre(
+        string calldata _nombre,
+        string calldata _nuevoSaludo
+    ) public {
+        // guardando en el mapping;
+        listaSaludosPorNombre[_nombre] = _nuevoSaludo;
+    }
+
+    function obtenerSaludoPorNombre(
+        string memory nombre
+    ) public view returns (string memory) {
+        return listaSaludosPorNombre[nombre];
+    }
+
+    function borrarSaludo(string memory nombre) public {
+        delete listaSaludosPorNombre[nombre];
+    }
+}
+```
+
+### Double Mapping o mapping anidados
+
+La estructura de datos `mapping` tambien puede tener otro `mapping` anidado. Ello permite guardar información más compleja. Un `mapping` anidado se asemeja mucho a una matriz de información o a una tabla de doble entrada. Es decir, dos valores (una fila y una columna) apuntarían a un tercer valor. Se crearía una coordenada (`x`  `y`) con un valor `z` en dicha coordenada.
+
+### Ejemplo
+
+En un salón de clases el profesor quiere llevar un registro de las notas de cada una de las materias de sus alumnos. Se da cuenta que tiene una lista alumnos y cada alumno tiene una lista de diferentes materias. Además, cada materia tiene diferente nota. Entonces aquí hay tres valores que registrar:
+
+* El nombre de cada alumno (supongamos que el nombre está representado por el tipo de dato `address`)
+* Las materias por cada alumno
+* Las notas por cada materia
+
+Podemos crear una matriz como la siguiente:
+
+|               | Historia | Lengua | Matematica | Geografia |
+| ------------- | -------- | ------ | ---------- | --------- |
+| Juan (0x01)   | 20       | 20     | 20         | 20        |
+| Maria (0x02)  | 20       | 20     | 20         | 20        |
+| Carlos (0x03) | 20       | 20     | 20         | 20        |
+| Sara (0x04)   | 20       | 20     | 20         | 20        |
+
+A cada nota le corresponde dos coordenadas: el nombre del alumno y una materia. Veamos como implementar esto en Solidity:
+
+```solidity
+// Podría empezar a construir lista solo con las materias y sus notas
+// materia => notas
+mapping(string => uint256) materiaYNotas;
+
+// Para Juan
+materiaYNotas["Historia"] = 20;
+materiaYNotas["Lengua"] = 20;
+materiaYNotas["Matematica"] = 20;
+// ...
+
+// Ahora puedo usar este mismo mapping para cada alumno
+// Es decir, cada alumno tendrá un mapping de materiaYNotas
+// alumno => materiaYNotas
+mapping(address => materiaYNotas) notasPorAlumno;
+
+// Guardando información
+notasPorAlumno[0x01]["Historia"] = 20;
+notasPorAlumno[0x02]["Historia"] = 20;
+notasPorAlumno[0x03]["Matematica"] = 20;
+// ...
+
+// Ahora puedo crear un mapping anidado directamente
+mapping(address => mapping(string => uint256)) notasPorAlumno;
+
+// Le puedo agregar nombres a las llaves y valores
+mapping(address alumno => mapping(string materia => uint256 nota)) notasPorAlumno;
+```
+
+El doble mapping es Smart Contracts es usando frecuentemente y cabe ahondar en su entendimiento y uso. Si hablamos de base de datos, esta relación podría considerarse _one-to-many_. Veamos el siguiente ejemplo:
+
+### Ejercicio
+
+En este ejercicio terminemos de crear los setters y getters para este `mapping`. Definamos métodos para poder guardar, consultar y borrar información del `mapping` anidado.
+
+`DoubleMapping_3.sol`
+
+```solidity
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.8.18;
+
+contract DoubleMapping {
+    // mapping(string => uint256) materiasYNotas;
+    // mapping(address => materiasYNotas) notasPorAlumno;
+
+    mapping(address alumno => mapping(string materia => uint256 nota)) notasPorAlumno;
+
+    function guardarNota(
+        address _alumno,
+        string calldata _materia,
+        uint256 _nota
+    ) public {
+        notasPorAlumno[_alumno][_materia] = _nota;
+    }
+
+    // con 'public' en notasPorAlumno no es necesario este método
+    function obtenerNota(
+        address _alumno,
+        string calldata _materia
+    ) public view returns (uint256) {
+        return notasPorAlumno[_alumno][_materia];
+    }
+
+    function borrarNota(address _alumno, string calldata _materia) public {
+        delete notasPorAlumno[_alumno][_materia];
+    }
+}
+```
+
+## Excepciones (Errores) y su propagación
+
+Solidity usa excepciones para manejar errores. En la situación en que una función llama a otras funciones, una excepción también puede detonarse y el error llegará a la superficie. Cuando estas excepciones son disparadas podría ir acompañado de información adicional.
+
+### Revierten el estado
+
+Estas excepciones revierten cualquier cambio de estado realizado durante la transacción en donde se dan estas excepciones. Es decir, o bien toda la transacción se procesa y se realizan todos los cambios de estado, o bien se revierten todos los cambios si es que una excepción se dispara.
+
+### La excepción `require`
+
+Era una de las formas más usadas para manejar las excepciones en Solidity. Sin embargo, `require` le está dando lugar a `revert` y los errores personalizados. 
+
+Normalmente se usa para validar los inputs del usuario, valores de variables o los valores de retornos de otros sub métodos. Suelen ir al inicio de los métodos.  Valida condiciones durante la ejecución del smart contract.
+
+```solidity
+// Sintaxis:
+require(condición); // condición es 'bool'
+require(condición, mensaje_de_error); // mensaje_de_error es 'string'
+```
+
+* `condición`: es una expresión booleana. Puede llevar otros operadores booleanos como `||`, `&&`, `>`, `<`, `<=`, `>=`, `!=` para poder evaluar múltiples condiciones.
+* `mensaje_de_error`: en caso la condición resulte en `false` se interrumpe la ejecución y se dispara la excepción con dicho mensaje de error. Es opcional.
+
+```solidity
+// Ejemplo:
+require(owner == msg.sender, "No es el duenio");
+require(!isPaused, "Esta pausado");
+```
+
+La excepción `require` crea un error del tipo `Error(string)`. Consume todo el gas hasta el momento en que se dispara el `require`. El gas consumido no es devuelto al usuario pero el restante sí.
+
+### La excepción `revert` y errores personalizados 
+
+Se usa en la misma situaciones que `require`. Solo difiere en la sintaxis y permite crear errores con nombres personalizados. El `revert` no tiene una validación dentro de la función sino que depende del desarrollador incluir las validaciones antes de llamar al `revert`. Ejecutar el `revert` solo lanza la excepción con el mensaje de error.
+
+```solidity
+// Sintaxis con mensaje de error:
+revert(mensaje_de_error);
+
+// Sintaxis sin mensaje (compatibilidad hacia atrás):
+revert();
+
+// Sintaxis con error personalizado:
+error ErrorPersonalizado();
+revert ErrorPersonalizado();
+
+// Sintaxis con error personalizado y argumentos:
+error ErrorPersonalizado(string _error);
+revert ErrorPersonalizado("Mensaje de error");
+
+// Validación aparte:
+if (!condition) revert ErrorPersonalizado();
+```
+
+Cuando se usa un error personalizado será más económico que usar un error con un mensaje de error. En el caso del error personalizado se puede user el mismo nombre del error para describirlo. Este nombre ocupa solo 4 bytes.
+
+```solidity
+// Ejemplo
+// require(owner == msg.sender, "No es el duenio");
+if (owner != msg.sender) revert("No es el duenio");
+
+// require(!isPaused, "Esta pausado");
+// usando custom error
+error EstaPausado();
+if (isPaused) revert EstaPausado();
+```
+
+Cuando se llama `revert()` genera un error sin información.  Cuando se llama`revert("mensaje de error")` se crea un error del tipo `Error(string)`. Utiliza el opcode `REVERT` por dentro. Consume todo el gas hasta el momento en que se dispara el `revert`. El gas consumido no es devuelto al usuario pero el restante sí.
+
+### La excepción `assert`
+
+Especialmente usado para **asegurar los invariantes**. Una invariante es **algo que es asumido como siempre verdadero** durante la ejecución de un programa. Son propiedades que nunca cambian. Son también **condiciones que deben permanecer igual durante la vida entera del contrato**. Esto aplica para transacciones, inputs del usuario y valores permanentes guardados dentro del smart contract. Por ejemplo, se puede asegurar que el **precio de un producto siempre será positivo** o que el inventario de un producto nunca será negativo.
+
+No se usa para validar inputs del usuario en las funciones. Típicamente, los `assert` van al final del método. Se utiliza para **controlar la correcta ejecución del código** al final de una función. Los `assert` no son usados de manera seguida. 
+
+```solidity
+// Sintaxis
+// condición es un bool
+// no lleva un mensaje de assert
+assert(condición); 
+```
+
+Disparar un `assert` implica que hay un bug en el código.
+
+```solidity
+// ejemplos
+assert(productPrice > 0);
+
+a = b - c;
+assert(a <= b);
+
+// la suma de x + y será siempre par
+assert((x + y) % 2 == 0);
+```
+
+Desde la versión `0.8.0`, la función `assert` crea un error del tipo `Panic(uint256)` cuyo opcode es `REVERT`.  Ello impica además que el gas restante será devuelto al usuario.
+
+<u>Nota:</u> Otras verificaciones que arroja el error del tipo `Panic(uint256)` y el opcode `REVERT` son la división por cero y el overflow aritmético.
+
+En el caso se de una situación en la cual se dispara un `assert` para un smart contract en producción, se recomienda que `assert` debería estar acompañado con otras técnicas como el pausado o la actualización (upgrades) de contratos inteligentes.
+
+### Verificación formal con `assert`
+
+Tener `assert` en el código te permite hacer análisis de Verificación Formal con herramientas como [SMT Checker](https://docs.soliditylang.org/en/v0.8.17/smtchecker.html) or the [K-Framework](https://github.com/kframework/solidity-semantics). Estas herramientas encontrarán caminos en los cuales los `assert` pueden no cumplirse. De esa manera se pueden descubrir más vulnerabilidades en un smart contract.
+
+### Ejercicio
+
+Tomar el ejemplo de `DoubleMapping_3.sol` y completa los siguientes requisitos en relación a `revert` y `require`. Crea dos errores personalizados llamados `NotaIncorrecta` y `AddressZero`. El primer error lleva un argumento llamado `nota` de tipo `uint256`. Implementar `revert` y su equivalente `require` en cada punto.
+
+GUARDAR NOTA:
+
+* 1G - La nota tiene que ser mayor o igual a 0 pero menor o igual a 20
+
+- 2G - El address del alumno no puede ser el address 0: `0x0000000000000000000000000000000000000000`
+- 3G - La materia no puede ser un string vacío
+
+BORRAR NOTA:
+
+- 1B - El address del alumno no puede ser el address 0: `0x0000000000000000000000000000000000000000`
+
+`RequireRevert_4.sol`
+
+```solidity
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.8.18;
+
+contract RevertRequire {
+
+    mapping(address alumno => mapping(string materia => uint256 nota)) notasPorAlumno;
+
+    error NotaIncorrecta(uint256 nota);
+    error AddressZero();
+
+    function guardarNota(
+        address _alumno,
+        string calldata _materia,
+        uint256 _nota
+    ) public {
+        // 1G - La nota tiene que ser mayor o igual a 0 pero menor o igual a 20
+        // require(_nota >= 0 && _nota <= 20, "Nota no esta entre 0 y 20");
+        // if (_nota < 0 || _nota > 20) revert NotaIncorrecta(_nota);
+        if (_nota < 0 || _nota > 20) revert NotaIncorrecta({nota: _nota});
+
+        // 2G - El address del alumno no puede ser el address 0: 0x0000000000000000000000000000000000000000
+        // require(_alumno != address(0), "Address no puede ser 0");
+        if (_alumno == address(0)) revert AddressZero();
+
+        // 3G - La materia no puede ser un string vacío
+        // if (bytes(_materia).length == 0) revert("Materia esta vacia");
+        require(bytes(_materia).length > 0, "Materia esta vacia");
+
+        notasPorAlumno[_alumno][_materia] = _nota;
+
+        // Validar si nuestra lógica de programación es correcta
+        // Valida que no haya un bug en el proceso de guardar nota
+        // Overkill tener un assert en cada función
+        assert(notasPorAlumno[_alumno][_materia] == _nota);
+    }
+
+    function obtenerNota(
+        address _alumno,
+        string calldata _materia
+    ) public view returns (uint256) {
+        return notasPorAlumno[_alumno][_materia];
+    }
+
+    function borrarNota(address _alumno, string calldata _materia) public {
+        //  1B - El address del alumno no puede ser el address 0: 0x0000000000000000000000000000000000000000
+        // require(_alumno != address(0), "Address no puede ser 0");
+        if (_alumno == address(0)) revert("Address no puede ser 0");
+
+        delete notasPorAlumno[_alumno][_materia];
+    }
+
+    // NO ES POSIBLE:
+    // En Solidity no se puede borrar un mapping completo, solo se puede borrar
+    // un elemento del mapping.
+    // Para borrar toda una fila se debe borrar elemento por elemento
+    // function borrarAlumno(address _alumno) public {
+    //     delete notasPorAlumno[_alumno];
+    // }
+}
+```
+
+En el caso del `revert` y `require` el error se propagará y será notado por el usuario en el front-end (dApp) antes de firmar una transacción mediante su billetera. Ejemplo de cómo se vería un error en producción [link](https://mumbai.polygonscan.com/tx/0xc96a8ad2c078065dae2c1fb02cf2590870346e17c5055e5ddc4637eb3f85d977):
+
+![image-20221005063900106](https://user-images.githubusercontent.com/112733805/194439364-dad1caf3-0c8f-47d6-aca6-c12587945d4e.png)
+
+## Ejercicio integrador #1
+
+Problema:
+
+`EjercicioIntegrador_1.sol`
+
+```solidity
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.8.18;
+
+/**
+ * Ejercicio integrador 1
+ *
+ * Vamos a usar mappings para manejar la propiedad de activos de usuario.
+ * Usaremos los tres niveles de mapping más usados:
+ * - single mapping
+ * - double mapping
+ * - triple mapping
+ *
+ * 1 - Mapping simple:
+ * Usaremos un mapping simple para guardar la cantidad de activos que tiene cada usuario
+ * Los usuarios se ven representados por sus billeteras
+ * Los cantidad de activos es un número entero
+ * mapping(address usuario => uint256 cantidad) public activosSimple;
+ * Nota:
+ *  - crear un método setter guardarActivoSimple que reciba un address y un uint256
+ *  - validar que el address no sea 0x00. Mensaje de error: "El address no puede ser 0x00"
+ *
+ * 2 - Mapping doble:
+ * Usaremos un mapping doble para guardar la cantidad de cada tipo de activo que tiene cada usuario
+ * Es decir, un usuario puede tener varios tipos de activos y cada uno de ellos puede tener una cantidad distinta
+ * Los usuarios se ven representados por sus billeteras
+ * Los activos se represetan con códigos que van del 000001 al 999999
+ * La cantidad de activos es un número entero
+ * mapping(address usuario => mapping(uint256 activoId => uint256 cantidad)) public activosDouble;
+ * Nota:
+ *  - crear un método setter guardarActivoDoble que reciba un address, un uint256 y un uint256
+ *  - validar que el address no sea 0x00. Mensaje de error: "El address no puede ser 0x00"
+ *  - validar que los códigos de activo estén entre 000001 y 999999. Mensaje de error: "Codigo de activo invalido"
+ *
+ * 3 - Mapping triple:
+ * Usaremos un mapping triple para guardar la cantidad de cada tipo de activo que tiene cada usuario de cada ciudad
+ * Es decir, en cada ciudad hay un usuario que tiene varios tipos de activos y cada uno de ellos puede tener una cantidad distinta
+ * Las ciudades se representan con códigos que van del 000001 al 999999
+ * Los usuarios se ven representados por sus billeteras
+ * Los activos se represetan con códigos que van del 000001 al 999999
+ * La cantidad de activos es un número entero
+ * mapping(uint256 ciudadId => mapping(address usuario => mapping(uint256 activoId => uint256 cantidad))) public activosTriple;
+ * Nota:
+ *  - crear un método setter guardarActivoTriple que reciba un address, un uint256, un uint256 y un uint256
+ *  - validar que el address no sea 0x00. Mensaje de error: "El address no puede ser 0x00"
+ *  - validar que los códigos de activo estén entre 000001 y 999999. Mensaje de error: "Codigo de activo invalido"
+ *  - validar que los códigos de ciudad estén entre 000001 y 999999. Mensaje de error: "Codigo de ciudad invalido"
+ *
+ * Para manejar los tres errores mencionados:
+ * 1 - Validar que el address no sea 0x00
+ *      Usar un require con la condición: _usuario != address(0)
+ *      (pude ir en un modifier o en el propio método)
+ *
+ * 2 - Validar que los códigos de activo
+ *      Usar un revert
+ *
+ * 3 - Validar que los códigos de ciudad
+ *      Crear un Custom Error llamado CiudadInvalidaError(uint256 ciudadId)
+ */
+
+contract Mapping {
+    // 1 - Mapping simple
+    mapping(address usuario => uint256 cantidad) public activosSimple;
+
+    function guardarActivoSimple(address _usuario, uint256 _cantidad) public {}
+
+    // 2 - Mapping double
+    mapping(address usuario => mapping(uint256 activoId => uint256 cantidad))
+        public activosDouble;
+
+    function guardarActivoDoble() public {}
+
+    // 3 - Mapping double
+    error CiudadInvalidaError(uint256 ciudadId);
+
+    mapping(uint256 ciudadId => mapping(address usuario => mapping(uint256 activoId => uint256 cantidad)))
+        public activosTriple;
+
+    function guardarActivoTriple() public {}
+}
+```
