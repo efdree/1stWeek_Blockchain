@@ -1514,3 +1514,458 @@ contract Mapping {
     function guardarActivoTriple() public {}
 }
 ```
+
+## Usando eventos a modo de notificación
+
+Los eventos en Solidity permiten al smart contract comunicar a las entidades que se suscriben información acerca de lo que sucede dentro de un contrato. Los eventos también pueden ser entendidos como logs que se guardan en el blockchain cada vez que se ejecuta una transacción. 
+
+### Suscripción
+
+Entidades externas para lograr captar eventos emitidos por el smart contract deben suscribirse. Ello les permite ejecutar otra lógica adicional cuando determinado suceso se da en el blockchain. Tanto el frontend como el backend son los más interesados en saber cuando algo sucede en el smart contract. Veamos algunos ejemplos:
+
+* El frontend puede estar pendiente a cuando sucede una venta o finaliza una subasta de un activo digital para poder mostrar dicha información en la página
+* Al desbloquear un logro en un juego se puede mostrar una notificación al resto de jugadores quién lo hizo y qué logro fue
+
+### Información adicional
+
+Los eventos pueden llevar información adicional para explicar lo que esá sucediendo. Dicha información es transmitida a través del nombre del evento seguido de otros argumentos opcionales.
+
+### Indexando los argumentos
+
+Se puede usar la palabra clave `indexed` para argumentos definidos dentro de un evento. La ventaja de realizar ello es que permitirá realizar una búsqueda con filtro más eficiente en el futuro. Se pueden indexar hasta tres argumentos.
+
+### Query de eventos
+
+Los eventos disparados se almacenan en el blockchain. De este modo, en un futuro se pueden hacer queries con específicos filtros para poder interpretar dicha información. Estos filtros pueden incluir fechas, números de bloque, nombre de eventos y cualquier otro argumento indexado puede ser usado como filtro.
+
+Ejemplo de como filtrar eventos:
+
+```javascript
+// Javascript
+// Defines el evento que quieres filtrar: "MiEvento"
+const miEvento = miContrato.events.MiEvento({
+  filter: {miParametro: [1, 2, 3]}, // filtras por valores específicos
+  fromBlock: 0, // inicio de número de bloque para delmitar búsqueda
+  toBlock: 'latest' // fin de número de bloque para delimitar búsqueda
+});
+```
+
+### Almacenamiento económico de información
+
+Guardar información en el Blockchain es costoso dado que dicha información queda grabada de manera permanente hasta que otra transacción diga lo contrario. Por ello mismo, guardar información en el Blockchain a través de eventos (logs) resulta muy económico para ciertas situaciones. El análisis a hacer es qué información se guardará en variables dentro del smart contract y qué información en los eventos. Se escoge la combinación que ahorre más gas.
+
+### Los contratos no escuchan
+
+Los contratos inteligentes no pueden suscribirse o escuchar cuando los eventos son disparados en el Blockchain. La única manera de disparar un método de un smart contract es hacer que el usuario llame directamente a dicho método o que otro método lo llame.
+
+### Evento anónimos
+
+Se pueden declarar eventos anónimos usando la palabra clave `anonymous`. Ello impide que otras entidades puedan suscribirse cuando este evento sucede. Los eventos anónimos pueden tener hasta cuatro argumentos por indexar y no forman parte del ABI (aplication binary interface). Estos eventos seguirán siendo emitidos en el Blockchain y su data puede ser vista por el explorador de bloques.
+
+### Sintaxis
+
+```solidity
+// definición de un evento (sin argumentos)
+event NombreDelEvento();
+
+// definición de un evento (con argumentos)
+event NombreDelEvento(otros argumentos con cualquier tipo de dato);
+
+// definición de un evento (con argumentos indexados)
+event NombreDelEvento(uint256 indexed edad, address indexed);
+
+// definición de un evento anónimo (con argumentos indexados)
+event NombreDelEvento(uint256 indexed edad, address indexed) anonymous;
+
+// propagación de un evento (dentro del método)
+emit NombreDelEvento(argumentos);
+```
+
+Los eventos para ser emitidos se acompañan de la palabra clave `emit` seguido del nombre del evento y sus argumentos si es que los tiene. Se emiten eventos únicamente dentro de un método.
+
+### Ejemplos
+
+`EventosEjemplo_5.sol`
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.18;
+
+contract Eventos {
+  // definición de un evento (sin argumentos)
+	event Transfer();
+	
+	// definición de un evento (con argumentos)
+	event Deposit(address sender, address receiver);
+	
+	// definición de un evento (con argumentos indexados)
+	event Withdraw(address indexed account, uint256 indexed amount, uint256 indexed date);
+	
+	// definición de un evento anónimo (con argumentos indexados)
+	event Extract(uint256 indexed amount, address indexed user, uint256 indexed date, uint256 indexed rest) anonymous;
+
+	function transfer() public {
+		emit Transfer();
+	}
+	
+	function deposit(address _receiver) public {
+		emit Deposit(msg.sender, _receiver);
+	}
+	
+	function withdraw(address account, uint256 amount) public {
+		emit Withdraw(account, amount, block.timestamp);
+	}
+
+	uint256 total = 100000000;
+	function extract(uint256 amount) public {
+		uint256 rest = total - amount;
+		emit Extract(amount, msg.sender, block.timestamp, rest);
+	}
+}
+```
+
+### Ejercicio
+
+Para realizar este ejercicio vamos a partir del archivo `DoubleMapping_3.sol` definido arriba para agregar los siguientes eventos:
+
+1. Crear un nuevo método llamada `actualizarNota` con la siguiente firma `function actualizarNota( address _alumno, string calldata _materia, uint256 _nuevaNota) public {}`. Completar apropiadamente el método.
+
+2. Crear un evento llamado `GuardarNota` con tres argumentos: 
+
+   1. `address alumno`
+
+   2. `string materia`
+
+   3. `uint256 nota`
+
+      El primero y el tercero son indexados.
+
+3. Crear un evento llamado `BorrarNota` con dos argumentos: 
+
+   1. `address alumno`
+
+   2. `string materia`
+
+      Solo el primero es indexado.
+
+4. Crear un evento anónimo llamado `ActualizarNota` con cuatro argumentos:
+
+   1. `address alumno`
+
+   2. `string materia`
+
+   3. `uint256 notaNueva`
+
+   4. `uint256 notaAnterior`
+
+   5. `uint256 fecha`
+
+      Los cuatro primeros son indexados
+
+5. Disparar los eventos en los métodos asociados para cada evento
+
+Revismos la solución de este ejercicio:
+
+`Eventos_6.sol`
+
+```solidity
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.8.18;
+
+contract DoubleMapping {
+    event GuardarNota(
+        address indexed alumno,
+        string materia,
+        uint256 indexed nota
+    );
+    event BorrarNota(address indexed alumno, string materia);
+    event ActualizarNota(
+        address indexed alumno,
+        string indexed materia,
+        uint256 indexed notaNueva,
+        uint256 indexed notaAnterior,
+        uint256 fecha
+    ) anonymous;
+
+    mapping(address alumno => mapping(string materia => uint256 nota)) notasPorAlumno;
+
+    function guardarNota(
+        address _alumno,
+        string calldata _materia,
+        uint256 _nota
+    ) public {
+        notasPorAlumno[_alumno][_materia] = _nota;
+
+        emit GuardarNota(_alumno, _materia, _nota);
+    }
+
+    function obtenerNota(
+        address _alumno,
+        string calldata _materia
+    ) public view returns (uint256) {
+        return notasPorAlumno[_alumno][_materia];
+    }
+
+    function borrarNota(address _alumno, string calldata _materia) public {
+        emit BorrarNota(_alumno, _materia);
+
+        delete notasPorAlumno[_alumno][_materia];
+    }
+
+    // Puedes emitir el evento primero para evitar crear un temporal de nota previa
+    function actualizarNota(
+        address _alumno,
+        string calldata _materia,
+        uint256 _nuevaNota
+    ) public {
+        uint256 _prevNota = notasPorAlumno[_alumno][_materia];
+        notasPorAlumno[_alumno][_materia] = _nuevaNota;
+
+        emit ActualizarNota(
+            _alumno,
+            _materia,
+            _prevNota,
+            _nuevaNota,
+            block.timestamp
+        );
+    }
+}
+```
+
+Ejemplos de eventos propagados en la red [link](https://polygonscan.com/address/0x54FC36444355602Fb110842411D3b0E6C4F1Cfd6#events).
+
+![image-20221005063541888](https://user-images.githubusercontent.com/112733805/194439372-2e95a90d-1d59-4c92-8e45-9f7746906317.png)
+
+## Variable global `msg.sender`
+
+Es la cuenta (address) que llama o ha ejecutado una función (de smart contract) o ha creado una transacción.
+
+Esta cuenta (address) puede ser una dirección de un contrato (CA) o una persona como nosotros (EOA).
+
+`msg.sender` funciona como una variable global dentro de Solidity y puede ser usada dentro de los métodos del Smart Contract como una variable ya definida.
+
+Otras variables globales en Solidity [link](https://docs.soliditylang.org/en/v0.8.9/cheatsheet.html?highlight=global%20variables#global-variables).
+
+`MsgSender_7.sol`
+
+```solidity
+contract MsgSender {
+    address public caller;
+
+    function setCaller() public {
+        caller = msg.sender;
+    }
+}
+```
+
+## Modifiers
+
+Un `modifier` es usado para cambiar el comportamiento de un método de una manera declarativa. El `modifier` también puede ser entendido como una manera de extender la funcionalidad de un método antes, durante o después de su ejecución. Es código encapsulado que puede ser reusado en múltiples funciones, lo cual disminuye la duplicación de código.
+
+Supongamos que queremos realizar ciertas validaciones antes de que un método sea ejecutado. Podríamos mover todas esas verificaciones al `modifier`. Incluso sería más apropiado cuando estas validaciones se tienen que repetir en otros métodos. En dicho caso solo se aplica el mismo `modifier` a otros métodos.
+
+### Protegiendo a un método (manera ingenua)
+
+Veamos el caso en el cual queremos proteger a cierto método de modo que sólo sea llamado por un `address` en particular que llamaremos `admin`.
+
+Para lograr ello, lo haremos de una manera ingenua utilizando un condicional. Luego lo implementaremos usando un modifier. Veamos:
+
+1. Con un simple `if` validamos que la persona que llama al método (`msg.sender`) sea la misma address que tenemos como `admin`. Si no lo es, terminamos el método con un `return`. Los cambios sucedidos en esta transacción no se revierten.
+2. Volvemos a utilizar el condicional `if` solo que  ahora hacemos que la transacción falle con un `revert();`, lo cual ocasiona que todos los cambios sucedidos en esa transacción se revierten.
+
+Veámoslo en código:
+
+```solidity
+contract SinModifiers {
+		// definimios la address 'admin'
+		address admin = 0x08Fb288FcC281969A0BBE6773857F99360f2Ca06;
+		
+		// 1 - método que queremos proteger 1
+		function metodoProtegido() public {
+			if (msg.sender != admin) return;
+			// ...
+		}
+		
+    // 2 - método que queremos proteger 2
+		function metodoProtegido2() public {
+			if (msg.sender != admin) revert();
+			// ...
+		}
+}
+```
+
+Las desventajas de hacerlo de esta manera es que en cada método que deseo incluir la validación del `msg.sender != admin` se tendrá que duplicar el código. 
+
+Ahora veamos cómo podemos hacer la misma validación a través del uso de modifiers:
+
+```solidity
+contract ConModifiers {
+		// definimios la address 'admin'
+		address admin = 0x08Fb288FcC281969A0BBE6773857F99360f2Ca06;
+		
+		modifier soloAdmin() {
+			require(msg.sender == admin, "Usuario no autorizado");
+			_;
+		}
+		
+		// 1 - método que queremos proteger 1
+		function metodoProtegido() public soloAdmin {
+			// ...
+		}
+		
+    // 2 - método que queremos proteger 2
+		function metodoProtegido2() public soloAdmin {
+			// ...
+		}
+}
+```
+
+Luego de la creación del modifier `soloAdmin` se ha logrado extender la funcionalidad de los métodos donde se usa este modifier. Ahora, antes de que se ejecute el cuerpo de dichos métodos, primero se ejecutará el modifer para realizar las validaciones necesarias.
+
+### Sintaxis
+
+Un `modifier` empieza por definirse por la palabra clave `modifier` seguido del nombre del mismo. Al interior de las llaves (`{}`) se define la lógica del `modifier` tal como si fuera un método.
+
+Un `modifier` debe incluir de manera obligatoria el `comodín fusión _;` ya que ello indica que se debe regresar a ejectuar el cuerpo del método donde está incluido ese `modifier`. 
+
+* Un modifier se puede definir con o sin argumentos:
+
+```solidity
+// 1 - sin argumentos
+modifier nombreDeModifier() {
+	// validaciones
+	_; // <-- comodín fusión
+}
+
+// 2 - con argumentos
+modifier nombreDeModifier(address caller) {
+	// validaciones
+	require(caller == adming, "No es el admin");
+	_;
+}
+```
+
+* Un `modifer` puede repetir varias veces el comodín fusión (`_;`) y por lo tanto ejecutar varias veces el cuerpo del método
+
+```solidity
+modifier repetirComodin(uint256 fecha) {
+	_; // <-- ejecuta por 1ra vez el cuerpo del método
+	require(fecha <= fechaLimite); // hace las validaciones
+	_; // <-- ejecuta por 2da vez el cuerpo del método
+}
+```
+
+Por lo general, el comodín fusión `_;` se sitúa al final del cuerpo del `modifier` ya que se busca que en primer lugar se realicen las validaciones o chequeos necesarios antes de proseguir con la ejecución del método donde está el modifier.
+
+### Casos de uso de modifier
+
+* Proteger un método para que solo sea llamado después de cierta fecha
+
+```solidity
+contract ProtegerFecha {
+	uint256 fechaLimite = 123456789;
+	modifier protegerFecha() {
+		require(fechaLimite <= block.timestamp, "Tiempo pasado insuficiente");
+		_;
+	}
+	
+	function protegerMetodo () public protegerFecha {
+		// ...
+	}
+}
+```
+
+* Proteger un método para que solo sea llamado cuando no esté pausado
+
+```solidity
+contract ProtegerPausa {
+	bool pausado;
+	modifier protegerPausa() {
+		require(!pausado, "Esta pausado");
+    _;
+	}
+	
+	function protegerMetodo () public protegerPausa {
+		// ...
+	}
+}
+```
+
+* Proteger un método para que solo sea llamado por un address de una lista
+
+```solidity
+contract ProtegerLista {
+	mapping(address => bool) listaBlanca;
+	
+	modifier protegerPorLista() {
+		require(listaBlanca[msg.sender], "No esta en la lista");
+    _;
+	}
+	
+	function protegerMetodo () public protegerPorLista {
+		// ...
+	}
+}
+```
+
+### Combinando múltiples `modifier`
+
+Se pueden combinar múltiples modifiers y aplicarse en un solo método. En esta situación tener en cuenta que los modifiers se llamarán en el orden en que son puestos en el método. En el ejemplo de a continuación, el orden de ejecución de los modifiers será: `protegerPausa`, `protegerPorLista` y `protegerFecha`.
+
+```solidity
+contract ProtegerMultipleModifier {
+    bool pausado;
+    uint256 fechaLimite = 123456789;
+    mapping(address => bool) listaBlanca;
+
+    modifier protegerPorLista() {
+        require(listaBlanca[msg.sender], "No esta en la lista");
+        _;
+    }
+
+    modifier protegerPausa() {
+        require(!pausado, "Esta pausado");
+        _;
+    }
+
+    modifier protegerFecha() {
+        require(fechaLimite <= block.timestamp, "Tiempo pasado insuficiente");
+        _;
+    }
+
+    function protegerMetodo()
+        public
+        protegerPausa
+        protegerPorLista
+        protegerFecha
+    {
+        // ...
+    }
+}
+```
+
+**Un `modifier` recibe los mismos argumentos del método**
+
+```solidity
+contract PasandoArgumentos {
+    modifier extenderEdad(
+        address user,
+        uint256 edad,
+        string memory nombre
+    ) {
+        // realizar logica
+        require(user != admin, "No esta autorizado");
+        require(edad > 20, "Edad inferior a 20");
+        require(bytes(nombre).length > 0, "Nombre no puede ser vacio");
+        _;
+    }
+
+    function calcularEdad(
+        address user,
+        uint256 edad,
+        string memory nombre
+    ) public extenderEdad(user, edad, nombre) {}
+}
+```
+
+## 
