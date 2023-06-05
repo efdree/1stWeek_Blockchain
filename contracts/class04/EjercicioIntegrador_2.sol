@@ -52,37 +52,57 @@ contract EjercicioDos {
 
     modifier soloAdmin() {
         // definir logica
+        require(msg.sender == admin, "No eres el admin");
         _;
     }
 
-    // function metodoAccesoProtegido() {
-    //     // ...logica
-    // }
+    function metodoAccesoProtegido() public soloAdmin {
+        //     // ...logica
+    }
 
     // 2
     // definir lista blanca con un mapping
     // mapping listaBlanca;
     // modifier soloListaBlanca
+    mapping(address usuario => bool permitido) listaBlanca;
+    modifier soloListaBlanca() {
+        require(listaBlanca[msg.sender], "Fuera de la lista blanca");
+        _;
+    }
 
-    // function metodoPermisoProtegido
+    function metodoPermisoProtegido() public soloListaBlanca {}
 
-    // function incluirEnListaBlanca
+    function incluirEnListaBlanca(
+        address _usuarioAListaBlanca
+    ) public soloAdmin {
+        listaBlanca[_usuarioAListaBlanca] = true;
+    }
 
     // 3
     // definir un rango de tiempo cualquiera (e.g. hoy + 30 days)
     // En solidity se cumple que: 1 days = 86400 seconds
     uint256 public tiempoLimite = block.timestamp + 30 days;
 
-    // modifier soloEnTiempo
+    modifier soloEnTiempo() {
+        require(block.timestamp <= tiempoLimite, "Fuera de tiempo");
+        _;
+    }
 
-    // function metodoTiempoProtegido
+    function metodoTiempoProtegido() public soloEnTiempo {}
 
     // 4
     // definir un booleano para pausar
     // bool public pausado;
     // modifier pausa
+    bool public pausado;
+    modifier pausa() {
+        if (pausado) revert("El metodo esta pausado");
+        _;
+    }
 
-    // function metodoPausaProtegido
+    function metodoPausaProtegido() public pausa {}
 
-    // function cambiarPausa()
+    function cambiarPausa() public soloAdmin {
+        pausado = true;
+    }
 }

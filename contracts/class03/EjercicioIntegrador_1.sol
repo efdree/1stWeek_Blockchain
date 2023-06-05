@@ -61,13 +61,25 @@ contract Mapping {
     // 1 - Mapping simple
     mapping(address usuario => uint256 cantidad) public activosSimple;
 
-    function guardarActivoSimple(address _usuario, uint256 _cantidad) public {}
+    function guardarActivoSimple(address _usuario, uint256 _cantidad) public {
+        require(_usuario != address(0x00), "El address no puede ser 0x00");
+        activosSimple[_usuario] = _cantidad;
+    }
 
     // 2 - Mapping double
     mapping(address usuario => mapping(uint256 activoId => uint256 cantidad))
         public activosDouble;
 
-    function guardarActivoDoble() public {}
+    function guardarActivoDoble(
+        address _usuario,
+        uint256 _activoId,
+        uint256 _cantidad
+    ) public {
+        require(_usuario != address(0x00), "El address no puede ser 0x00");
+        if (_activoId < 0 || _activoId > 999999)
+            revert("Codigo de activo invalido");
+        activosDouble[_usuario][_activoId] = _cantidad;
+    }
 
     // 3 - Mapping double
     error CiudadInvalidaError(uint256 ciudadId);
@@ -75,5 +87,17 @@ contract Mapping {
     mapping(uint256 ciudadId => mapping(address usuario => mapping(uint256 activoId => uint256 cantidad)))
         public activosTriple;
 
-    function guardarActivoTriple() public {}
+    function guardarActivoTriple(
+        uint256 _ciudadId,
+        address _usuario,
+        uint256 _activoId,
+        uint256 _cantidad
+    ) public {
+        require(_usuario != address(0x00), "El address no puede ser 0x00");
+        if (_activoId < 0 || _activoId > 999999)
+            revert("Codigo de activo invalido");
+        if (_ciudadId < 0 || _ciudadId > 999999)
+            revert CiudadInvalidaError(_ciudadId);
+        activosTriple[_ciudadId][_usuario][_activoId] = _cantidad;
+    }
 }
